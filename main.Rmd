@@ -1,0 +1,91 @@
+---
+title: "TP Simulations des lois - Mardoché Clabessi"
+output: html_notebook
+---
+```{r}
+if(!require("stats")) install.packages("stats")
+library(stats)
+```
+
+# Paramètres
+```{r}
+obs <- 1000 # Nombre d'observations à simuler pour chaque variable aléatoire
+N <- 5 # Paramètre N, modifiable
+```
+
+# 1. Génération de N variables aléatoires X1, ..., XN gaussiennes N(0,1)
+```{r}
+set.seed(123) # pour la reproductibilité
+X <- matrix(rnorm(obs * N), nrow = obs, ncol = N)
+for (gauss_index in 1:N){
+  Gauss_rv = X[, gauss_index]
+  plot(density(Gauss_rv), main=paste("Densité de loi normale centré réduite X", gauss_index, sep=""), xlab=paste("Valeurs de X",gauss_index, sep=""))
+}
+```
+
+# 2. Loi de Chi-2
+```{r}
+X_squared_sum <- rowSums(X^2) # X1^2 + ... + XN^2
+```
+
+
+## 2a. Tracer la densité de la loi Chi-2
+```{r}
+plot(density(X_squared_sum), main = paste("Densité de la loi Chi-2 avec N =", N), xlab = "Valeurs de X²")
+```
+
+
+## 2b. Histogramme de la loi Chi-2
+```{r}
+hist(X_squared_sum, breaks = 30, main = paste("Histogramme de la loi Chi-2 avec N =", N), xlab = "Valeurs de X²", probability = TRUE)
+lines(density(X_squared_sum), col = "blue")
+```
+
+
+# 3. Loi de Student
+```{r}
+student_variable <- X[, 1] / sqrt(rowSums(X^2) / N)
+```
+
+
+## 3a. Tracer la densité de la loi de Student
+```{r}
+plot(density(student_variable), main = paste("Densité de la loi de Student avec N =", N), xlab = "Valeurs de Student")
+```
+
+
+## 3b. Histogramme de la loi de Student
+```{r}
+hist(student_variable, breaks = 30, main = paste("Histogramme de la loi de Student avec N =", N), xlab = "Valeurs de Student", probability = TRUE)
+lines(density(student_variable), col = "red")
+```
+
+
+# 4. Loi de Fisher
+```{r}
+X_next <- matrix(rnorm(obs * (N + 1)), nrow = obs, ncol = N + 1)
+fisher_variable <- (rowSums(X^2) / N) / (rowSums(X_next^2) / (N + 1))
+```
+
+
+## 4a. Tracer la densité de la loi de Fisher
+```{r}
+plot(density(fisher_variable), main = paste("Densité de la loi de Fisher avec N =", N, "et N+1 =", N + 1), xlab = "Valeurs de Fisher")
+```
+
+
+## 4b. Histogramme de la loi de Fisher
+```{r}
+hist(fisher_variable, breaks = 30, main = paste("Histogramme de la loi de Fisher avec N =", N, "et N+1 =", N + 1), xlab = "Valeurs de Fisher", probability = TRUE)
+lines(density(fisher_variable), col = "green")
+```
+
+
+# 5. QQplot pour les lois gaussiennes
+```{r}
+for(gauss_index in 1:N){
+qqnorm(X[, gauss_index], main = paste("QQplot pour la distribution Gaussienne X",gauss_index, sep=""))
+qqline(X[, gauss_index], col = "blue")
+}
+```
+
